@@ -2,3 +2,5 @@
 /config
 /data
 .env
+docker-compose.override.yml
+entrypoint.d

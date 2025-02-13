@@ -6,3 +6,8 @@ LICENSE
 README.md
 .git
 .idea
+.env
+data
+USE_SERVER.md
+entrypoint.d
+docker-compose.override.yml
