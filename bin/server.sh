@@ -2,6 +2,12 @@
 
 # https://dev.to/leandronsp/building-a-web-server-in-bash-part-ii-parsing-http-14kg
 
+if [ "${DEBUG}" = "true" ]
+then
+  printf "Server launched with : "
+  id
+fi
+
 rm -f /home/ruby/response
 mkfifo /home/ruby/response
 
