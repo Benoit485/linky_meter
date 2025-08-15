@@ -2,7 +2,7 @@
 require 'date'
 require 'mechanize'
 require 'json'
-#require 'byebug'
+# require 'byebug'
 
 # This class is used to retrieve data from the electrical meter
 module Linky
@@ -13,10 +13,6 @@ module Linky
     URL_COOKIE = 'https://mon-compte.enedis.fr'
     URL_USER_INFOS = '/mon-compte/api/private/v2/userinfos'
     URL_USER_INFOS_2 = '/mon-compte/api/private/v2/userinfos?espace=PARTICULIER'
-
-    def get_url_prms_id(av2_interne_id)
-      "/mes-prms-part/api/private/v2/personnes/#{av2_interne_id}/prms"
-    end
 
     public
 
@@ -175,17 +171,25 @@ module Linky
 
       user_data = JSON.parse(r.body)
       @av2_interne_id = user_data['cnAlex']
+      @id_personne = user_data['idPersonne']
 
       @agent.log&.info('LinkyMeter: retrieve primary key ==> IdPrm')
       @prm_id = ''
-      url = get_url_prms_id(@av2_interne_id)
+      url = "/mes-prms-part/api/private/v2/personnes/#{@av2_interne_id}/prms"
       r = @agent.get(url)
       raise('authentication probably failed') if r.code != '200'
 
       user_data = JSON.parse(r.body)
       @prm_id = user_data[0]['idPrm']
 
-      @agent.log&.info("LinkyMeter: authentication done #{@av2_interne_id} #{@prm_id}")
+      url = "/mes-prms-part/api/private/v2/personnes/#{@av2_interne_id}/prms/#{@prm_id}?embed=SITCOM&embed=SYNCON"
+      r = @agent.get(url)
+      raise('authentication probably failed') if r.code != '200'
+
+      userdata = JSON.parse(r.body)
+      @segment = userdata['segment']
+
+      @agent.log&.info("LinkyMeter: authentication done av2: #{@av2_interne_id} id_personne: #{@id_personne} prm_id: #{@prm_id} segment: #{@segment}")
     end
 
     ##
@@ -203,10 +207,10 @@ module Linky
 
       case step
       when BY_YEAR, BY_MONTH, BY_DAY
-        url = "/mes-mesures-prm/api/private/v1/personnes/#{@av2_interne_id}/prms/#{@prm_id}/donnees-energetiques?mesuresTypeCode=ENERGIE&mesuresCorrigees=false&typeDonnees=CONS&dateDebut=#{begin_date}"
+        url = "/mes-mesures-prm/api/private/v2/personnes/#{@id_personne}/prms/#{@prm_id}/donnees-energetiques?mesuresTypeCode=ENERGIE&mesuresCorrigees=false&typeDonnees=CONS&dateDebut=#{begin_date}&segments=#{@segment}"
 
       when BY_HOUR
-        url = "/mes-mesures-prm/api/private/v1/personnes/#{@av2_interne_id}/prms/#{@prm_id}/donnees-energetiques?mesuresTypeCode=COURBE&mesuresCorrigees=false&typeDonnees=CONS&dateDebut=#{begin_date}"
+        url = "/mes-mesures-prm/api/private/v2/personnes/#{@id_personne}/prms/#{@prm_id}/donnees-energetiques?mesuresTypeCode=COURBE&mesuresCorrigees=false&typeDonnees=CONS&dateDebut=#{begin_date}&segments=#{@segment}"
 
       else
         raise(ArgumentError, 'wrong value for step argument')
