@@ -26,7 +26,7 @@ RUN ln -s /home/ruby/app/bin/parserPower.sh /usr/local/bin/parserPower \
 RUN ln -s /home/ruby/app/bin/server.sh /usr/local/bin/server \
     && chmod +x /home/ruby/app/bin/server.sh
 
-COPY ./lib/* ./lib/
+COPY ./lib/ ./lib
 COPY *.rb .
 
 COPY ./entrypoint.sh /entrypoint.sh

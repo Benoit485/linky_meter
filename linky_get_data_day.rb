@@ -13,7 +13,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #load 'linky_meter.rb'
-require_relative 'lib/linky_meter'
+require_relative 'lib/linky/linky_meter'
 # require 'byebug'
 
 username = ENV['LINKY_USERNAME']
@@ -23,12 +23,12 @@ authentication_cookie = ENV['LINKY_COOKIE_INTERNAL_AUTH_ID']
 # dateTo = ENV['DATE_TO']
 LOG = (ENV['DEBUG'] === 'true')
 
-linky = LinkyMeter.new(LOG)
+linky = Linky::LinkyMeter.new(LOG)
 linky.connect(username, password, authentication_cookie)
 
-result = linky.get(DateTime.new(2024, 04, 15), DateTime.new(2024, 04, 17), LinkyMeter::BY_DAY)
+result = linky.get(DateTime.new(2024, 04, 15), DateTime.new(2024, 04, 17), Linky::LinkyMeter::BY_DAY)
 
 # Not need to pass date to linky_meter because enedis will give every date what they have in stock (~3y)
-#result = linky.get(DateTime.iso8601(dateFrom), DateTime.iso8601(dateTo), LinkyMeter::BY_DAY)
+#result = linky.get(DateTime.iso8601(dateFrom), DateTime.iso8601(dateTo), Linky::LinkyMeter::BY_DAY)
 
 puts JSON.generate(result)
