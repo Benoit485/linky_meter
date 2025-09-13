@@ -53,3 +53,8 @@ secrets:
 # docker login <registry_url>
 # docker buildx create --name container --driver=docker-container
 # docker compose build --builder container --push
+# docker compose pull
+# docker compose up -d
+# docker compose exec linky_meter bin/parser.sh
+
+# docker compose build --builder container --push && docker compose pull && docker compose up -d && docker compose exec linky_meter bin/parser.sh
